@@ -7,7 +7,7 @@ Project Timeframe: 31 May - 20 June 2023
 ## Main Components used:
 
 - Arduino Uno board
-- LCD 128x64 screen
+- LCD 128x64 screen (specifically the ST7920 chipset/controller)
 - Piezo Buzzer, for sound effects
 - Breadboard
 - Jumper Wires

@@ -7,7 +7,7 @@ Project Timeframe: 31 May - 20 June 2023
 ## Main Components used:
 
 - Arduino Uno board
-- LCD 128x64 screen
+- LCD 128x64 screen (specifically the ST7920 chipset/controller)
 - Piezo Buzzer, for sound effects
 - Breadboard
 - Jumper Wires
@@ -27,3 +27,5 @@ I wanted to create some kind of game in an Arduino form with some type of LCD sc
 - https://www.instructables.com/LCD-Invaders-a-Space-Invaders-Like-Game-on-16x2-LC/ 
 - ChatGPT for the Space invaders idea
 - https://www.arduino.cc/reference/en/libraries/u8g2/ 
+
+Setup reference: https://github.com/olikraus/u8g2/wiki/u8g2setupcpp#st7920-128x64

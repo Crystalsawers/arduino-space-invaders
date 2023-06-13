@@ -27,5 +27,6 @@ I wanted to create some kind of game in an Arduino form with some type of LCD sc
 - https://www.instructables.com/LCD-Invaders-a-Space-Invaders-Like-Game-on-16x2-LC/ 
 - ChatGPT for the Space invaders idea
 - https://www.arduino.cc/reference/en/libraries/u8g2/ 
+- https://github.com/rmorenojr/SpaceInvaders_U8g2/blob/master/SpaceInvaders_U8g2.ino
 
 Setup reference: https://github.com/olikraus/u8g2/wiki/u8g2setupcpp#st7920-128x64

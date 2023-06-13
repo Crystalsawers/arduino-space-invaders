@@ -3,6 +3,7 @@
 
 #include <U8g2lib.h>
 
+
 class Aliens {
   private:
     U8G2_ST7920_128X64_F_SW_SPI _display;
@@ -21,5 +22,4 @@ class Aliens {
     void update();
     void draw();
 };
-
 #endif

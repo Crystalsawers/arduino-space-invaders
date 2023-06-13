@@ -7,12 +7,8 @@ byte alienPattern[] = {
   B10101010   // Row 4: Pixels turned on: 1, 3, 5, 7
 };
 
-Aliens::Aliens(U8G2_ST7920_128X64_F_SW_SPI display, int alienSize, int spacing, int rows, int columns): _display(display){
-  _alienSize = alienSize;
-  _spacing = spacing;
-  _rows = rows;
-  _columns = columns;
-
+Aliens::Aliens(U8G2_ST7920_128X64_F_SW_SPI display, int alienSize, int spacing, int rows, int columns)
+    : _display(display), _alienSize(alienSize), _spacing(spacing), _rows(rows), _columns(columns), _x(0), _y(0), _speed(1) {
 
 _alienData = new byte*[_rows * _columns];
 for (int i = 0; i < _rows * _columns; i++) {
@@ -33,11 +29,13 @@ Aliens::~Aliens() {
 void Aliens::update() {
   _x += _speed;
 
-  if (_x < -8 || _x > _display.getWidth()) {
-    _speed *= -1;     // Reverse horizontal direction
-    _y += 10;         // Move the alien downwards
+  if (_x < -_alienSize || _x > _display.getWidth()) {
+    _speed *= -1;   // Reverse horizontal direction
+    _y += 10;       // Move the aliens downwards
   }
 }
+
+
 
 void Aliens::draw() {
   int xPos;

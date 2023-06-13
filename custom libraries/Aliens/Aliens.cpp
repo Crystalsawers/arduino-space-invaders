@@ -1,10 +1,14 @@
 #include "Aliens.h"
 
 byte alienPattern[] = {
-  B00111100,  // Row 1: Pixels turned on: 3, 4, 5, 6
-  B01111110,  // Row 2: Pixels turned on: 2, 3, 4, 5, 6, 7
-  B11111111,  // Row 3: All pixels turned on
-  B10101010   // Row 4: Pixels turned on: 1, 3, 5, 7
+  B00111100,  // Row 1
+  B01111110,  // Row 2
+  B11000011,  // Row 3
+  B11111111,  // Row 4
+  B10100101,  // Row 5
+  B11111111,  // Row 6
+  B00100100,  // Row 7
+  B01000010   // Row 8
 };
 
 Aliens::Aliens(U8G2_ST7920_128X64_F_SW_SPI display, int alienSize, int spacing, int rows, int columns)
@@ -29,11 +33,12 @@ Aliens::~Aliens() {
 void Aliens::update() {
   _x += _speed;
 
-  if (_x < -_alienSize || _x > _display.getWidth()) {
+  if (_x < -(_columns * (_alienSize + _spacing)) || _x > _display.getWidth()) {
     _speed *= -1;   // Reverse horizontal direction
     _y += 10;       // Move the aliens downwards
   }
 }
+
 
 
 

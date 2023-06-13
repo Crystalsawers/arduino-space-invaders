@@ -1,15 +1,16 @@
 #include "Aliens.h"
 
 byte alienPattern[] = {
-  B00111100,  // Row 1
-  B01111110,  // Row 2
-  B11000011,  // Row 3
-  B11111111,  // Row 4
-  B10100101,  // Row 5
-  B11111111,  // Row 6
-  B00100100,  // Row 7
-  B01000010   // Row 8
+  B01000010,  // Row 1
+  B00100100,  // Row 2
+  B11111111,  // Row 3
+  B10100101,  // Row 4
+  B11111111,  // Row 5
+  B11000011,  // Row 6
+  B01111110,  // Row 7
+  B00111100   // Row 8
 };
+
 
 Aliens::Aliens(U8G2_ST7920_128X64_F_SW_SPI display, int alienSize, int spacing, int rows, int columns)
     : _display(display), _alienSize(alienSize), _spacing(spacing), _rows(rows), _columns(columns), _x(0), _y(0), _speed(1) {

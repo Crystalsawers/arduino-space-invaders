@@ -15,7 +15,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   alienFunction();
   Mothership();
-  delay(1000);
+  delay(10000);
 }
 
 void alienFunction() {
@@ -34,6 +34,7 @@ void alienFunction() {
 
 void Mothership() {
 
+// Draw mothership
 byte mothershipBytes[] = {
   B00010000,  // Row 1
   B00010000,  // Row 2

@@ -30,3 +30,11 @@ I wanted to create some kind of game in an Arduino form with some type of LCD sc
 - https://github.com/rmorenojr/SpaceInvaders_U8g2/blob/master/SpaceInvaders_U8g2.ino
 
 Setup reference: https://github.com/olikraus/u8g2/wiki/u8g2setupcpp#st7920-128x64
+
+With the help of ChatGPT I prompted this to customise my aliens using bytes:
+
+- what would be the byte code for at least one space invaders alien, the most commonly used one?
+
+and it's response came up with this:
+
+![image](https://github.com/Crystalsawers/arduino-space-invaders/assets/87682183/45495ba9-c850-421d-b874-47861e6d471f)

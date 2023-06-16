@@ -33,18 +33,26 @@ int rows = 2;
 int columns = 6;
 int x = 0;
 int y = 0;
-int speed = 2;
+int speed = 1;
+
+unsigned long previousUpdateTime = 0;
+unsigned long updateInterval = 500;  // Update interval in milliseconds
 
 void setup() {
-  // put your setup code here, to run once:
-  u8g2.begin();
+
+u8g2.begin();
 }
 
 void loop() {
+    unsigned long currentMillis = millis();
+  // Check if it's time to update the display
+  if (currentMillis - previousUpdateTime >= updateInterval) {
+    previousUpdateTime = currentMillis;
 
-  updateAliens();
-  drawScene();
-  delay(500);
+    updateAliens();
+    drawScene();
+  }
+
 }
 
 void updateAliens() {
@@ -79,9 +87,10 @@ void drawScene() {
 }
 
 void drawAliens() {
-  u8g2.firstPage();
+  u8g2.firstPage();  // Start drawing on the first page
+
   do {
-    u8g2.clearBuffer();
+    u8g2.clearBuffer();  // Clear the buffer
 
     for (int row = 0; row < rows; row++) {
       for (int col = 0; col < columns; col++) {
@@ -106,8 +115,11 @@ void drawAliens() {
         }
       }
     }
-  } while (u8g2.nextPage());
+  } while (u8g2.nextPage());  // Continue to the next page
 }
+
+
+
 
 void drawMothership() {
   int xPos = 0;
@@ -119,6 +131,7 @@ void drawMothership() {
       if (row & (1 << (7 - j))) {
         int pixelX = xPos + j;
         int pixelY = yPos + i;
+        u8g2.setDrawColor(1);  // Set pixel color to white
         u8g2.drawPixel(pixelX, pixelY);
       }
     }

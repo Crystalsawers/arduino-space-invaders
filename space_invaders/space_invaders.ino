@@ -73,53 +73,45 @@ void updateAliens() {
 }
 
 void drawScene() {
+  u8g2.firstPage();
 
-  u8g2.clearBuffer();
+  do {
+    u8g2.clearBuffer();
 
-  // Draw the aliens
-  drawAliens();
+    // Draw the aliens
+    drawAliens();
 
-  // Draw the mothership
-  drawMothership();
+    // Draw the mothership
+    drawMothership();
 
-  u8g2.sendBuffer();  // Send the buffer to the display
+  } while (u8g2.nextPage());
 }
 
 void drawAliens() {
-  u8g2.firstPage();  // Start drawing on the first page
+  for (int row = 0; row < rows; row++) {
+    for (int col = 0; col < columns; col++) {
+      int xPos = x + col * (alienSize + spacing);
+      int yPos = y + row * (alienSize + spacing);
 
-  do {
-    u8g2.clearBuffer();  // Clear the buffer
+      for (int yy = 0; yy < alienSize; yy++) {
+        for (int xx = 0; xx < alienSize; xx++) {
+          int byteIndex = yy * alienSize + xx;
+          int bitIndex = byteIndex % 8;
+          int arrayIndex = byteIndex / 8;
+          byte mask = 1 << bitIndex;
+          bool isSet = alienPattern[arrayIndex] & mask;
 
-    for (int row = 0; row < rows; row++) {
-      for (int col = 0; col < columns; col++) {
-        int xPos = x + col * (alienSize + spacing);
-        int yPos = y + row * (alienSize + spacing);
+          int pixelX = xPos + xx;
+          int pixelY = yPos + yy;
 
-        for (int yy = 0; yy < alienSize; yy++) {
-          for (int xx = 0; xx < alienSize; xx++) {
-            int byteIndex = yy * alienSize + xx;
-            int bitIndex = byteIndex % 8;
-            int arrayIndex = byteIndex / 8;
-            byte mask = 1 << bitIndex;
-            bool isSet = alienPattern[arrayIndex] & mask;
-
-            int pixelX = xPos + xx;
-            int pixelY = yPos + yy;
-
-            if (isSet) {
-              u8g2.setDrawColor(1);  // Set pixel color to white
-              u8g2.drawPixel(pixelX, pixelY);
-            }
+          if (isSet) {
+            u8g2.drawPixel(pixelX, pixelY);
           }
         }
       }
     }
-  } while (u8g2.nextPage());  // Continue to the next page
+  }
 }
-
-
-
 
 void drawMothership() {
   int xPos = 0;
@@ -131,13 +123,11 @@ void drawMothership() {
       if (row & (1 << (7 - j))) {
         int pixelX = xPos + j;
         int pixelY = yPos + i;
-        u8g2.setDrawColor(1);  // Set pixel color to white
         u8g2.drawPixel(pixelX, pixelY);
       }
     }
   }
 }
-
 
 void mothershipMove() {
   // this is where the mothership moves with the joystick

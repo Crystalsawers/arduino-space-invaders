@@ -40,11 +40,12 @@ unsigned long updateInterval = 500;  // Update interval in milliseconds
 
 void setup() {
 
-u8g2.begin();
+  u8g2.begin();
+  u8g2.setFlipMode(1);  // Set flip mode to double buffering
 }
 
 void loop() {
-    unsigned long currentMillis = millis();
+  unsigned long currentMillis = millis();
   // Check if it's time to update the display
   if (currentMillis - previousUpdateTime >= updateInterval) {
     previousUpdateTime = currentMillis;
@@ -52,7 +53,6 @@ void loop() {
     updateAliens();
     drawScene();
   }
-
 }
 
 void updateAliens() {
@@ -73,17 +73,16 @@ void updateAliens() {
 }
 
 void drawScene() {
-  u8g2.firstPage();
-  do {
-    u8g2.clearBuffer();
 
-    // Draw the aliens
-    drawAliens();
+  u8g2.clearBuffer();
 
-    // Draw the mothership
-    drawMothership();
+  // Draw the aliens
+  drawAliens();
 
-  } while (u8g2.nextPage());
+  // Draw the mothership
+  drawMothership();
+
+  u8g2.sendBuffer();  // Send the buffer to the display
 }
 
 void drawAliens() {
@@ -109,6 +108,7 @@ void drawAliens() {
             int pixelY = yPos + yy;
 
             if (isSet) {
+              u8g2.setDrawColor(1);  // Set pixel color to white
               u8g2.drawPixel(pixelX, pixelY);
             }
           }

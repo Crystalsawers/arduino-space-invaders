@@ -15,6 +15,18 @@ byte alienPattern[] = {
   B00111100   // Row 8
 };
 
+// Draw the mothership
+byte mothershipBytes[] = {
+  B00010000,  // Row 1
+  B00010000,  // Row 2
+  B00111000,  // Row 3
+  B00111000,  // Row 4
+  B01111100,  // Row 5
+  B01111110,  // Row 6
+  B11011011,  // Row 7
+  B11011011   // Row 8
+};
+
 int alienSize = 8;
 int spacing = 4;
 int rows = 2;
@@ -31,8 +43,7 @@ void setup() {
 void loop() {
 
   updateAliens();
-  drawAliens();
-  //drawAliensAndMothership();
+  drawScene();
   delay(500);
 }
 
@@ -51,6 +62,20 @@ void updateAliens() {
       y = 0;
     }
   }
+}
+
+void drawScene() {
+  u8g2.firstPage();
+  do {
+    u8g2.clearBuffer();
+
+    // Draw the aliens
+    drawAliens();
+
+    // Draw the mothership
+    drawMothership();
+
+  } while (u8g2.nextPage());
 }
 
 void drawAliens() {
@@ -82,6 +107,22 @@ void drawAliens() {
       }
     }
   } while (u8g2.nextPage());
+}
+
+void drawMothership() {
+  int xPos = 0;
+  int yPos = u8g2.getHeight() - 8;
+
+  for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 8; j++) {
+      byte row = mothershipBytes[i];
+      if (row & (1 << (7 - j))) {
+        int pixelX = xPos + j;
+        int pixelY = yPos + i;
+        u8g2.drawPixel(pixelX, pixelY);
+      }
+    }
+  }
 }
 
 

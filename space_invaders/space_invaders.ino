@@ -68,6 +68,8 @@ int missileY = -1;  // meaning no active missile
 unsigned long previousUpdateTime = 0;
 unsigned long updateInterval = 250;  // Update interval in milliseconds
 
+bool hasWon = false;
+bool hasLost = false;
 
 void setup() {
 
@@ -79,9 +81,9 @@ void setup() {
 }
 
 void loop() {
-
   unsigned long currentMillis = millis();
-  // Check if it's time to update the display
+
+  // Update the display
   if (currentMillis - previousUpdateTime >= updateInterval) {
     previousUpdateTime = currentMillis;
 
@@ -90,8 +92,65 @@ void loop() {
     checkButtonState();
     fireMissile();
     drawScene();
+
+    // Check if the game has already been won or lost
+    // if (hasWon || hasLost) {
+    //   // Display the win or lose message on a separate page
+    //   displayResultPage();
+    // } else {
+    //   // Add the win and lose conditions
+    //   if (allAliensDead()) {
+    //     hasWon = true;
+    //   } else if (mothershipHit()) {
+    //     hasLost = true;
+    //   }
+    // }
   }
 }
+
+
+void displayResultPage() {
+  u8g2.firstPage();
+  do {
+    u8g2.clearBuffer();
+
+    if (hasWon) {
+      u8g2.drawStr(20, 30, "You win!");
+    } else if (hasLost) {
+      u8g2.drawStr(20, 30, "You lose!");
+    }
+
+  } while (u8g2.nextPage());
+}
+
+bool mothershipHit() {
+  // Check if the mothership is hit by an alien
+  for (int row = 0; row < rows; row++) {
+    for (int col = 0; col < columns; col++) {
+      if (alienStatus[row][col] == 1) {
+        int alienX = x + col * (alienSize + spacing);
+        int alienY = y + row * (alienSize + spacing);
+
+        if (mothershipX >= alienX && mothershipX < alienX + alienSize && mothershipY >= alienY && mothershipY < alienY + alienSize) {
+          return true;  // Mothership is hit
+        }
+      }
+    }
+  }
+  return false;
+}
+
+bool allAliensDead() {
+  for (int row = 0; row < rows; row++) {
+    for (int col = 0; col < columns; col++) {
+      if (alienStatus[row][col] == 1) {
+        return false;  // At least one alien is still alive
+      }
+    }
+  }
+  return true;  // All aliens are dead
+}
+
 
 void checkButtonState() {
   int buttonValue = digitalRead(fireButtonPin);

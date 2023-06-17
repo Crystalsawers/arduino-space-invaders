@@ -138,16 +138,29 @@ void checkCollision() {
     return;
   }
 
-  int alienColumn = (mothershipX + (alienSize / 2)) / (alienSize + spacing);
-  int alienRow = (missileY - y - alienSize) / (alienSize + spacing);
+  int missileColumn = (mothershipX - x) / (alienSize + spacing);  // Column of the missile
+  int missileRow = (missileY - y) / (alienSize + spacing);  // Row of the missile
 
-  if (alienRow >= 0 && alienRow < rows && alienColumn >= 0 && alienColumn < columns && alienStatus[alienRow][alienColumn] == 1) {
-    // Collision with an alive alien
-    missileState = Collision;
-    alienStatus[alienRow][alienColumn] = 0;  // Set the alien as dead or gone
-    // Perform any additional actions, such as updating the score
+  // Check if any alive alien intersects with the missile's path
+  for (int row = 0; row < rows; row++) {
+    for (int col = 0; col < columns; col++) {
+      if (alienStatus[row][col] == 1) {
+        int alienX = x + col * (alienSize + spacing);
+        int alienY = y + row * (alienSize + spacing);
+
+        // Check if the missile intersects with the alien
+        if (missileColumn >= col && missileColumn < col + 1 && missileRow >= row && missileRow < row + 1) {
+          // Collision with an alive alien
+          missileState = Collision;
+          alienStatus[row][col] = 0;  // Set the alien as dead or gone
+          // Perform any additional actions, such as updating the score
+          return;  // Exit the function early since collision detected
+        }
+      }
+    }
   }
 }
+
 
 void fireButtonInterrupt() {
   if (missileState == Idle) {

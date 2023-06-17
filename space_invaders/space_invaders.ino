@@ -3,8 +3,9 @@
 
 U8G2_ST7920_128X64_F_SW_SPI u8g2(U8G2_R0, /* clock=*/13, /* data=*/11, /* CS=*/10, /* reset=*/8);
 
-const int joystickXPin = A0; // Analog input pin for X-axis
-const int joystickDeadZone = 20; // Dead zone for joystick reading
+const int joystickXPin = A0;      // Analog input pin for X-axis as im only using it to move mothership horizontally
+const int fireButtonPin = 2;      // Digital input pin for fire button
+const int joystickDeadZone = 20;  // Dead zone for joystick reading
 
 byte alienPattern[] = {
   B01000010,  // Row 1
@@ -16,6 +17,12 @@ byte alienPattern[] = {
   B01111110,  // Row 7
   B00111100   // Row 8
 };
+
+byte alienStatus[2][6] = {
+  {1, 1, 1, 1, 1, 1},  // Row 1
+  {1, 1, 1, 1, 1, 1}   // Row 2
+};
+
 
 // Draw the mothership
 byte mothershipBytes[] = {
@@ -35,10 +42,22 @@ int rows = 2;
 int columns = 6;
 int x = 0;
 int y = 0;
-int mothershipX = 0;
+int mothershipX = 55;
 int mothershipY = 0;
 int alienSpeed = 1;
 int mothershipSpeed = 4;
+const int missileSpeed = 8;
+
+// all the possible missile states
+enum State {
+  Idle,
+  Firing,
+  Active,
+  Collision
+};
+
+State missileState = Idle;
+int missileY = -1;  // meaning no active missile
 
 unsigned long previousUpdateTime = 0;
 unsigned long updateInterval = 500;  // Update interval in milliseconds
@@ -47,9 +66,11 @@ void setup() {
 
   u8g2.begin();
   u8g2.setFlipMode(1);  // Set flip mode to double buffering
+  pinMode(fireButtonPin, INPUT_PULLUP);
 }
 
 void loop() {
+
   unsigned long currentMillis = millis();
   // Check if it's time to update the display
   if (currentMillis - previousUpdateTime >= updateInterval) {
@@ -57,10 +78,9 @@ void loop() {
 
     updateAliens();
     mothershipMove();
+    //fireMissile();
     drawScene();
   }
-
-
 }
 
 void updateAliens() {
@@ -79,6 +99,56 @@ void updateAliens() {
     }
   }
 }
+
+void fireMissile() {
+  switch (missileState) {
+    case Idle:
+      if (digitalRead(fireButtonPin) == LOW) {
+        missileState = Firing;
+      }
+      break;
+
+    case Firing:
+      missileY = u8g2.getHeight() - 9;  // Start missile from the bottom of the screen
+      missileState = Active;
+      break;
+
+    case Active:
+      missileY -= missileSpeed;
+      if (missileY < 0) {
+        missileState = Idle;
+        missileY = -1;
+      } else {
+        checkCollision();
+      }
+      break;
+
+    case Collision:
+      // Handle collision state, e.g., remove the alien or update score
+      missileState = Idle;
+      missileY = -1;
+      break;
+  }
+}
+
+void checkCollision() {
+  for (int row = 0; row < rows; row++) {
+    for (int col = 0; col < columns; col++) {
+      int alienX = x + col * (alienSize + spacing);
+      int alienY = y + row * (alienSize + spacing);
+
+      if (missileY >= alienY && missileY < alienY + alienSize && alienStatus[row][col] == 1) {
+        // Collision with an alive alien
+        missileState = Collision;
+        alienStatus[row][col] = 0;  // Set the alien as dead or gone
+        // Perform any additional actions, such as updating the score
+        return;
+      }
+    }
+  }
+}
+
+
 
 void drawScene() {
   u8g2.firstPage();
@@ -101,19 +171,22 @@ void drawAliens() {
       int xPos = x + col * (alienSize + spacing);
       int yPos = y + row * (alienSize + spacing);
 
-      for (int yy = 0; yy < alienSize; yy++) {
-        for (int xx = 0; xx < alienSize; xx++) {
-          int byteIndex = yy * alienSize + xx;
-          int bitIndex = byteIndex % 8;
-          int arrayIndex = byteIndex / 8;
-          byte mask = 1 << bitIndex;
-          bool isSet = alienPattern[arrayIndex] & mask;
+      if (alienStatus[row][col] == 1) {
+        // Alien is alive, draw it
+        for (int yy = 0; yy < alienSize; yy++) {
+          for (int xx = 0; xx < alienSize; xx++) {
+            int byteIndex = yy * alienSize + xx;
+            int bitIndex = byteIndex % 8;
+            int arrayIndex = byteIndex / 8;
+            byte mask = 1 << bitIndex;
+            bool isSet = alienPattern[arrayIndex] & mask;
 
-          int pixelX = xPos + xx;
-          int pixelY = yPos + yy;
+            int pixelX = xPos + xx;
+            int pixelY = yPos + yy;
 
-          if (isSet) {
-            u8g2.drawPixel(pixelX, pixelY);
+            if (isSet) {
+              u8g2.drawPixel(pixelX, pixelY);
+            }
           }
         }
       }
@@ -121,8 +194,9 @@ void drawAliens() {
   }
 }
 
+
 void drawMothership() {
-  int xPos = mothershipX; // 55 for the middle
+  int xPos = mothershipX;  // 55 for the middle
   int yPos = u8g2.getHeight() - 8;
 
   for (int i = 0; i < 8; i++) {

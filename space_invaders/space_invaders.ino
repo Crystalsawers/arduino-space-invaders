@@ -68,6 +68,8 @@ void setup() {
   u8g2.begin();
   u8g2.setFlipMode(1);  // Set flip mode to double buffering
   pinMode(fireButtonPin, INPUT_PULLUP);
+  // external interrupt for firing missile everytime the button is pressed
+ attachInterrupt(digitalPinToInterrupt(fireButtonPin), fireButtonInterrupt, FALLING);
 }
 
 void loop() {
@@ -148,7 +150,12 @@ void checkCollision() {
   }
 }
 
-
+void fireButtonInterrupt() {
+  if (missileState == Idle) {
+    missileY = u8g2.getHeight() - 9;  // Start missile from the bottom of the screen
+    missileState = Active;
+  }
+}
 
 void drawScene() {
   u8g2.firstPage();

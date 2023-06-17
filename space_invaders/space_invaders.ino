@@ -18,9 +18,10 @@ byte alienPattern[] = {
   B00111100   // Row 8
 };
 
+// bytes for the layout of the aliens on screen for each alien
 byte alienStatus[2][6] = {
-  {1, 1, 1, 1, 1, 1},  // Row 1
-  {1, 1, 1, 1, 1, 1}   // Row 2
+  { 1, 1, 1, 1, 1, 1 },  // Row 1
+  { 1, 1, 1, 1, 1, 1 }   // Row 2
 };
 
 
@@ -46,7 +47,7 @@ int mothershipX = 55;
 int mothershipY = 0;
 int alienSpeed = 1;
 int mothershipSpeed = 4;
-const int missileSpeed = 8;
+const int missileSpeed = 16;
 
 // all the possible missile states
 enum State {
@@ -60,7 +61,7 @@ State missileState = Idle;
 int missileY = -1;  // meaning no active missile
 
 unsigned long previousUpdateTime = 0;
-unsigned long updateInterval = 500;  // Update interval in milliseconds
+unsigned long updateInterval = 250;  // Update interval in milliseconds
 
 void setup() {
 
@@ -78,7 +79,7 @@ void loop() {
 
     updateAliens();
     mothershipMove();
-    //fireMissile();
+    fireMissile();
     drawScene();
   }
 }
@@ -132,19 +133,18 @@ void fireMissile() {
 }
 
 void checkCollision() {
-  for (int row = 0; row < rows; row++) {
-    for (int col = 0; col < columns; col++) {
-      int alienX = x + col * (alienSize + spacing);
-      int alienY = y + row * (alienSize + spacing);
+  if (missileState != Active) {
+    return;
+  }
 
-      if (missileY >= alienY && missileY < alienY + alienSize && alienStatus[row][col] == 1) {
-        // Collision with an alive alien
-        missileState = Collision;
-        alienStatus[row][col] = 0;  // Set the alien as dead or gone
-        // Perform any additional actions, such as updating the score
-        return;
-      }
-    }
+  int alienColumn = (mothershipX + 3) / (alienSize + spacing);  // Column of the target alien
+  int alienRow = (missileY - y) / (alienSize + spacing);  // Row of the target alien
+
+  if (alienRow >= 0 && alienRow < rows && alienColumn >= 0 && alienColumn < columns && alienStatus[alienRow][alienColumn] == 1) {
+    // Collision with an alive alien
+    missileState = Collision;
+    alienStatus[alienRow][alienColumn] = 0;  // Set the alien as dead or gone
+    // Perform any additional actions, such as updating the score
   }
 }
 
@@ -156,11 +156,10 @@ void drawScene() {
   do {
     u8g2.clearBuffer();
 
-    // Draw the aliens
-    drawAliens();
 
-    // Draw the mothership
+    drawAliens();
     drawMothership();
+    drawMissile();
 
   } while (u8g2.nextPage());
 }
@@ -194,7 +193,6 @@ void drawAliens() {
   }
 }
 
-
 void drawMothership() {
   int xPos = mothershipX;  // 55 for the middle
   int yPos = u8g2.getHeight() - 8;
@@ -208,6 +206,16 @@ void drawMothership() {
         u8g2.drawPixel(pixelX, pixelY);
       }
     }
+  }
+}
+
+void drawMissile() {
+  if (missileState == Active) {
+    int xPos = mothershipX + 3;  // X position of the missile, aligned with the mothership
+    int yPos = missileY;
+
+    // Draw a vertical line to represent the missile
+    u8g2.drawVLine(xPos, yPos, 4);
   }
 }
 

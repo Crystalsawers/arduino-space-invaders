@@ -48,19 +48,26 @@ int alienSpeed = 1;
 int mothershipSpeed = 4;
 const int missileSpeed = 16;
 
+const int debounceDelay = 50;  // Debounce delay in milliseconds
+
+bool isButtonPressed = false;
+bool wasButtonReleased = true;
+
 // all the possible missile states
-enum State {
+enum MissileState {
   Idle,
   Firing,
   Active,
   Collision
 };
 
-State missileState = Idle;
+
+MissileState missileState = Idle;
 int missileY = -1;  // meaning no active missile
 
 unsigned long previousUpdateTime = 0;
 unsigned long updateInterval = 250;  // Update interval in milliseconds
+
 
 void setup() {
 
@@ -68,7 +75,7 @@ void setup() {
   u8g2.setFlipMode(1);  // Set flip mode to double buffering
   pinMode(fireButtonPin, INPUT_PULLUP);
   // external interrupt for firing missile everytime the button is pressed
- attachInterrupt(digitalPinToInterrupt(fireButtonPin), fireButtonInterrupt, FALLING);
+  attachInterrupt(digitalPinToInterrupt(fireButtonPin), fireButtonInterrupt, FALLING);
 }
 
 void loop() {
@@ -80,10 +87,24 @@ void loop() {
 
     updateAliens();
     mothershipMove();
+    checkButtonState();
     fireMissile();
     drawScene();
   }
 }
+
+void checkButtonState() {
+  int buttonValue = digitalRead(fireButtonPin);
+
+  if (buttonValue == LOW && wasButtonReleased) {
+    isButtonPressed = true;
+    wasButtonReleased = false;
+  } else if (buttonValue == HIGH && !wasButtonReleased) {
+    wasButtonReleased = true;
+  }
+}
+
+
 
 void updateAliens() {
   x += alienSpeed;
@@ -105,8 +126,9 @@ void updateAliens() {
 void fireMissile() {
   switch (missileState) {
     case Idle:
-      if (digitalRead(fireButtonPin) == LOW) {
+      if (isButtonPressed) {
         missileState = Firing;
+        isButtonPressed = false;  // Reset button state after firing
       }
       break;
 
@@ -133,13 +155,14 @@ void fireMissile() {
   }
 }
 
+
 void checkCollision() {
   if (missileState != Active) {
     return;
   }
 
   int missileColumn = (mothershipX - x) / (alienSize + spacing);  // Column of the missile
-  int missileRow = (missileY - y) / (alienSize + spacing);  // Row of the missile
+  int missileRow = (missileY - y) / (alienSize + spacing);        // Row of the missile
 
   // Check if any alive alien intersects with the missile's path
   for (int row = 0; row < rows; row++) {
@@ -153,8 +176,8 @@ void checkCollision() {
           // Collision with an alive alien
           missileState = Collision;
           alienStatus[row][col] = 0;  // Set the alien as dead or gone
-          // Perform any additional actions, such as updating the score
-          return;  // Exit the function early since collision detected
+                                      // Perform any additional actions, such as updating the score
+          return;                     // Exit the function early since collision detected
         }
       }
     }
@@ -163,10 +186,7 @@ void checkCollision() {
 
 
 void fireButtonInterrupt() {
-  if (missileState == Idle) {
-    missileY = u8g2.getHeight() - 9;  // Start missile from the bottom of the screen
-    missileState = Active;
-  }
+  isButtonPressed = true;
 }
 
 void drawScene() {

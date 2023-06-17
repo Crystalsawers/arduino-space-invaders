@@ -3,6 +3,8 @@
 
 U8G2_ST7920_128X64_F_SW_SPI u8g2(U8G2_R0, /* clock=*/13, /* data=*/11, /* CS=*/10, /* reset=*/8);
 
+const int joystickXPin = A0; // Analog input pin for X-axis
+const int joystickDeadZone = 20; // Dead zone for joystick reading
 
 byte alienPattern[] = {
   B01000010,  // Row 1
@@ -33,7 +35,10 @@ int rows = 2;
 int columns = 6;
 int x = 0;
 int y = 0;
-int speed = 1;
+int mothershipX = 0;
+int mothershipY = 0;
+int alienSpeed = 1;
+int mothershipSpeed = 4;
 
 unsigned long previousUpdateTime = 0;
 unsigned long updateInterval = 500;  // Update interval in milliseconds
@@ -51,15 +56,18 @@ void loop() {
     previousUpdateTime = currentMillis;
 
     updateAliens();
+    mothershipMove();
     drawScene();
   }
+
+
 }
 
 void updateAliens() {
-  x += speed;
+  x += alienSpeed;
 
   if (x < 0 || x >= (u8g2.getWidth() - (columns * (alienSize + spacing)))) {
-    speed *= -1;  // Reverse the direction
+    alienSpeed *= -1;  // Reverse the direction
 
     // Move the aliens downwards
     y += alienSize + spacing;
@@ -114,7 +122,7 @@ void drawAliens() {
 }
 
 void drawMothership() {
-  int xPos = 0;
+  int xPos = mothershipX; // 55 for the middle
   int yPos = u8g2.getHeight() - 8;
 
   for (int i = 0; i < 8; i++) {
@@ -130,5 +138,20 @@ void drawMothership() {
 }
 
 void mothershipMove() {
-  // this is where the mothership moves with the joystick
+  int joystickValue = analogRead(joystickXPin);
+
+  // Check if joystick value is within the dead zone
+  if (abs(joystickValue - 512) < joystickDeadZone) {
+    return;  // No movement within dead zone, return
+  }
+
+  // Move the mothership based on joystick value
+  if (joystickValue < 512) {
+    mothershipX -= mothershipSpeed;
+  } else {
+    mothershipX += mothershipSpeed;
+  }
+
+  // Limit the mothership movement within the screen width
+  mothershipX = constrain(mothershipX, 0, u8g2.getWidth() - 8);
 }

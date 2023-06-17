@@ -1,4 +1,3 @@
-
 #include <U8g2lib.h>
 
 U8G2_ST7920_128X64_F_SW_SPI u8g2(U8G2_R0, /* clock=*/13, /* data=*/11, /* CS=*/10, /* reset=*/8);
@@ -139,8 +138,8 @@ void checkCollision() {
     return;
   }
 
-  int alienColumn = (mothershipX + 3) / (alienSize + spacing);  // Column of the target alien
-  int alienRow = (missileY - y) / (alienSize + spacing);  // Row of the target alien
+  int alienColumn = (mothershipX + (alienSize / 2)) / (alienSize + spacing);
+  int alienRow = (missileY - y - alienSize) / (alienSize + spacing);
 
   if (alienRow >= 0 && alienRow < rows && alienColumn >= 0 && alienColumn < columns && alienStatus[alienRow][alienColumn] == 1) {
     // Collision with an alive alien
@@ -163,9 +162,8 @@ void drawScene() {
   do {
     u8g2.clearBuffer();
 
-
-    drawAliens();
     drawMothership();
+    drawAliens();
     drawMissile();
 
   } while (u8g2.nextPage());

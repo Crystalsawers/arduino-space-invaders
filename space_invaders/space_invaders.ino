@@ -4,6 +4,7 @@ U8G2_ST7920_128X64_F_SW_SPI u8g2(U8G2_R0, /* clock=*/13, /* data=*/11, /* CS=*/1
 
 const int joystickXPin = A0;      // Analog input pin for X-axis as im only using it to move mothership horizontally
 const int fireButtonPin = 2;      // Digital input pin for fire button
+const int soundPin = 3;          // Digital pin for sound
 const int joystickDeadZone = 20;  // Dead zone for joystick reading
 
 byte alienPattern[] = {
@@ -76,6 +77,7 @@ void setup() {
   u8g2.begin();
   u8g2.setFlipMode(1);  // Set flip mode to double buffering
   pinMode(fireButtonPin, INPUT_PULLUP);
+  pinMode(soundPin, OUTPUT);
   // external interrupt for firing missile everytime the button is pressed
   attachInterrupt(digitalPinToInterrupt(fireButtonPin), fireButtonInterrupt, FALLING);
 }
@@ -112,7 +114,7 @@ void loop() {
           } while (u8g2.nextPage());
         }
 
-        break; // Exit the loop and end the game
+        break;  // Exit the loop and end the game
       }
     }
   }
@@ -155,12 +157,12 @@ void updateAliens() {
 
     if (y >= (u8g2.getHeight() - (rows * (alienSize + spacing)))) {
       // Aliens have reached the bottom
-      gameOver = true; // Set game over state
+      gameOver = true;  // Set game over state
     }
   }
 
   if (allAliensDead()) {
-    gameOver = true; // Set game over state
+    gameOver = true;  // Set game over state
   }
 }
 
@@ -315,4 +317,36 @@ void mothershipMove() {
 
   // Limit the mothership movement within the screen width
   mothershipX = constrain(mothershipX, 0, u8g2.getWidth() - 8);
+}
+
+void winningSound() {
+
+  int numNotes = 11;
+
+  int frequencies[] = { 554, 622, 415, 622, 698, 830, 783, 698, 622, 554, 622 };
+
+  int rhythm[] = { 16, 16, 8, 16, 16, 2, 2, 2, 2, 16, 16};
+
+  for (int i = 0; i < numNotes; i++) {
+    tone(soundPin, frequencies[i], 150 * rhythm[i]);
+    delay(60 * rhythm[i]);
+  }
+  noTone(soundPin);
+  delay(5000);
+}
+
+void losingSound() {
+
+  int numNotes = 4;
+
+  int frequencies[] = { 311, 293, 277, 261 };
+
+  int rhythm[] = { 8, 8, 8, 16 };
+
+  for (int i = 0; i < numNotes; i++) {
+    tone(soundPin, frequencies[i], 150 * rhythm[i]);
+    delay(60 * rhythm[i]);
+  }
+  noTone(soundPin);
+  delay(5000);  // Delay between melodies
 }

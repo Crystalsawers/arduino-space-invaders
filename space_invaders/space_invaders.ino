@@ -93,34 +93,27 @@ void loop() {
     fireMissile();
     drawScene();
 
-    // Check if the game has already been won or lost
-    // if (hasWon || hasLost) {
-    //   // Display the win or lose message on a separate page
-    //   displayResultPage();
-    // } else {
-    //   // Add the win and lose conditions
-    //   if (allAliensDead()) {
-    //     hasWon = true;
-    //   } else if (mothershipHit()) {
-    //     hasLost = true;
-    //   }
-    // }
-  }
-}
-
-
-void displayResultPage() {
-  u8g2.firstPage();
-  do {
-    u8g2.clearBuffer();
-
-    if (hasWon) {
-      u8g2.drawStr(20, 30, "You win!");
-    } else if (hasLost) {
-      u8g2.drawStr(20, 30, "You lose!");
+    // game over if you kill all aliens
+    if (allAliensDead()) {
+      u8g2.firstPage();
+      do {
+        u8g2.clearBuffer();
+        u8g2.setFont(u8g2_font_helvB08_tr);
+        u8g2.drawStr(35, 20, "You win!");
+      } while (u8g2.nextPage());
     }
 
-  } while (u8g2.nextPage());
+  //  if (mothershipHit()) {
+  //     u8g2.firstPage();
+  //     do {
+  //       u8g2.clearBuffer();
+  //       u8g2.setFont(u8g2_font_helvB08_tr);
+  //       u8g2.drawStr(35, 20, "You lose!");
+  //     } while (u8g2.nextPage());
+  //   }
+
+
+  }
 }
 
 bool mothershipHit() {

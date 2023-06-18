@@ -20,21 +20,21 @@ byte alienPattern[] = {
 
 // bytes for the layout of the aliens on screen for each alien
 byte alienStatus[2][6] = {
-  { 1, 1, 1, 1, 1, 1 },  // Row 1
-  { 1, 1, 1, 1, 1, 1 }   // Row 2
+  { 1, 1, 1, 1, 1, 1 },  // top row of each alien
+  { 1, 1, 1, 1, 1, 1 }   // bottom row of each alien
 };
 
 
 // Draw the mothership
 byte mothershipBytes[] = {
-  B00010000,  // Row 1
-  B00010000,  // Row 2
-  B00111000,  // Row 3
-  B00111000,  // Row 4
-  B01111100,  // Row 5
-  B01111110,  // Row 6
-  B11011011,  // Row 7
-  B11011011   // Row 8
+  B00010000,
+  B00010000,
+  B00111000,
+  B00111000,
+  B01111100,
+  B01111110,
+  B11011011,
+  B11011011
 };
 
 int alienSize = 8;
@@ -71,6 +71,28 @@ unsigned long previousUpdateTime = 0;
 unsigned long updateInterval = 250;  // Update interval in milliseconds
 
 bool gameOver = false;
+bool playAgain = false;
+
+void resetGame() {
+  // Reset all game variables and states to their initial values
+  x = 0;
+  y = 0;
+  mothershipX = 55;
+  mothershipY = 0;
+  alienSpeed = 1;
+  mothershipSpeed = 4;
+  missileState = Idle;
+  missileY = -1;
+  previousUpdateTime = 0;
+  gameOver = false;
+
+  // Reset the alien status
+  for (int row = 0; row < rows; row++) {
+    for (int col = 0; col < columns; col++) {
+      alienStatus[row][col] = 1;
+    }
+  }
+}
 
 void setup() {
 
@@ -80,6 +102,7 @@ void setup() {
   pinMode(soundPin, OUTPUT);
   // external interrupt for firing missile everytime the button is pressed
   attachInterrupt(digitalPinToInterrupt(fireButtonPin), fireButtonInterrupt, FALLING);
+  Serial.begin(9600);
 }
 
 void loop() {
@@ -104,6 +127,7 @@ void loop() {
             u8g2.clearBuffer();
             u8g2.setFont(u8g2_font_helvB08_tr);
             u8g2.drawStr(35, 20, "You win!");
+            u8g2.drawStr(10, 40, "Restarting in 5 sec...");
           } while (u8g2.nextPage());
           winningSound();
         } else {
@@ -112,15 +136,23 @@ void loop() {
             u8g2.clearBuffer();
             u8g2.setFont(u8g2_font_helvB08_tr);
             u8g2.drawStr(35, 20, "You lose!");
+            u8g2.drawStr(10, 40, "Restarting in 5 sec...");
           } while (u8g2.nextPage());
           losingSound();
         }
 
-        break;  // Exit the loop and end the game
+        if (digitalRead(fireButtonPin) == HIGH) {
+          resetGame();
+          playAgain = true;
+        }
+        
       }
+
+      break;  // Exit the loop and end the game
     }
   }
 }
+
 
 
 bool allAliensDead() {
@@ -206,8 +238,8 @@ void checkCollision() {
     return;
   }
 
-  int missileColumn = (mothershipX - x) / (alienSize + spacing);  // Column of the missile
-  int missileRow = (missileY - y) / (alienSize + spacing);        // Row of the missile
+  int missileColumn = (mothershipX - x) / (alienSize + spacing);
+  int missileRow = (missileY - y) / (alienSize + spacing);
 
   // Check if any alive alien intersects with the missile's path
   for (int row = 0; row < rows; row++) {
@@ -222,7 +254,7 @@ void checkCollision() {
           missileState = Collision;
           alienStatus[row][col] = 0;  // Set the alien as dead or gone
           tone(soundPin, 130, 200);
-          return;                     // Exit the function early since collision detected
+          return;  // Exit the function early since collision detected
         }
       }
     }
@@ -350,5 +382,5 @@ void losingSound() {
     delay(60 * rhythm[i]);
   }
   noTone(soundPin);
-  delay(5000);  // Delay between melodies
+  delay(5000);
 }

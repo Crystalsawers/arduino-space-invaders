@@ -4,7 +4,7 @@ U8G2_ST7920_128X64_F_SW_SPI u8g2(U8G2_R0, /* clock=*/13, /* data=*/11, /* CS=*/1
 
 const int joystickXPin = A0;      // Analog input pin for X-axis as im only using it to move mothership horizontally
 const int fireButtonPin = 2;      // Digital input pin for fire button
-const int soundPin = 3;          // Digital pin for sound
+const int soundPin = 3;           // Digital pin for sound
 const int joystickDeadZone = 20;  // Dead zone for joystick reading
 
 byte alienPattern[] = {
@@ -105,7 +105,7 @@ void loop() {
             u8g2.setFont(u8g2_font_helvB08_tr);
             u8g2.drawStr(35, 20, "You win!");
           } while (u8g2.nextPage());
-            winningSound();
+          winningSound();
         } else {
           u8g2.firstPage();
           do {
@@ -113,7 +113,7 @@ void loop() {
             u8g2.setFont(u8g2_font_helvB08_tr);
             u8g2.drawStr(35, 20, "You lose!");
           } while (u8g2.nextPage());
-            losingSound();
+          losingSound();
         }
 
         break;  // Exit the loop and end the game
@@ -221,7 +221,7 @@ void checkCollision() {
           // Collision with an alive alien
           missileState = Collision;
           alienStatus[row][col] = 0;  // Set the alien as dead or gone
-                                      // Perform any additional actions, such as updating the score
+          tone(soundPin, 130, 200);
           return;                     // Exit the function early since collision detected
         }
       }
@@ -327,7 +327,7 @@ void winningSound() {
 
   int frequencies[] = { 554, 622, 415, 622, 698, 830, 783, 698, 622, 554, 622 };
 
-  int rhythm[] = { 16, 16, 8, 16, 16, 2, 2, 2, 2, 16, 16};
+  int rhythm[] = { 16, 16, 8, 16, 16, 2, 2, 2, 2, 16, 16 };
 
   for (int i = 0; i < numNotes; i++) {
     tone(soundPin, frequencies[i], 150 * rhythm[i]);

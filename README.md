@@ -18,6 +18,9 @@ Project Timeframe: 31 May - 20 June 2023
 
 ## Circuit Diagram
 
+![image](https://github.com/Crystalsawers/arduino-space-invaders/assets/87682183/bb1e8051-74e3-4d9c-94ca-51bce28cc8ce)
+
+
 ## Narrative
 
 I wanted to create some kind of game in an Arduino form with some type of LCD screen. The goal was to make it as entertaining and engaging as possible with adding some sound, a joystick to move the spaceship, and buttons to fire the missile to hit the alien. The score represented in my game is how many aliens you shoot before the aliens get to the bottom of the screen and/or hit the spaceship. There is an unlimited amount of missiles, and at the end of the game it shows how many aliens you shoot in the score and whether you win or you lose.

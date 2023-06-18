@@ -105,6 +105,7 @@ void loop() {
             u8g2.setFont(u8g2_font_helvB08_tr);
             u8g2.drawStr(35, 20, "You win!");
           } while (u8g2.nextPage());
+            winningSound();
         } else {
           u8g2.firstPage();
           do {
@@ -112,6 +113,7 @@ void loop() {
             u8g2.setFont(u8g2_font_helvB08_tr);
             u8g2.drawStr(35, 20, "You lose!");
           } while (u8g2.nextPage());
+            losingSound();
         }
 
         break;  // Exit the loop and end the game

@@ -44,6 +44,7 @@ int x = 0;
 int y = 0;
 int mothershipX = 55;
 int mothershipY = 0;
+int mothershipHeight = 8;
 int alienSpeed = 1;
 int mothershipSpeed = 4;
 const int missileSpeed = 16;
@@ -68,8 +69,7 @@ int missileY = -1;  // meaning no active missile
 unsigned long previousUpdateTime = 0;
 unsigned long updateInterval = 250;  // Update interval in milliseconds
 
-bool hasWon = false;
-bool hasLost = false;
+bool gameOver = false;
 
 void setup() {
 
@@ -81,57 +81,43 @@ void setup() {
 }
 
 void loop() {
-  unsigned long currentMillis = millis();
+  while (!gameOver) {
+    unsigned long currentMillis = millis();
 
-  // Update the display
-  if (currentMillis - previousUpdateTime >= updateInterval) {
-    previousUpdateTime = currentMillis;
+    // Update the display
+    if (currentMillis - previousUpdateTime >= updateInterval) {
+      previousUpdateTime = currentMillis;
 
-    updateAliens();
-    mothershipMove();
-    checkButtonState();
-    fireMissile();
-    drawScene();
+      updateAliens();
+      mothershipMove();
+      checkButtonState();
+      fireMissile();
+      drawScene();
 
-    // game over if you kill all aliens
-    if (allAliensDead()) {
-      u8g2.firstPage();
-      do {
-        u8g2.clearBuffer();
-        u8g2.setFont(u8g2_font_helvB08_tr);
-        u8g2.drawStr(35, 20, "You win!");
-      } while (u8g2.nextPage());
-    }
-
-  //  if (mothershipHit()) {
-  //     u8g2.firstPage();
-  //     do {
-  //       u8g2.clearBuffer();
-  //       u8g2.setFont(u8g2_font_helvB08_tr);
-  //       u8g2.drawStr(35, 20, "You lose!");
-  //     } while (u8g2.nextPage());
-  //   }
-
-
-  }
-}
-
-bool mothershipHit() {
-  // Check if the mothership is hit by an alien
-  for (int row = 0; row < rows; row++) {
-    for (int col = 0; col < columns; col++) {
-      if (alienStatus[row][col] == 1) {
-        int alienX = x + col * (alienSize + spacing);
-        int alienY = y + row * (alienSize + spacing);
-
-        if (mothershipX >= alienX && mothershipX < alienX + alienSize && mothershipY >= alienY && mothershipY < alienY + alienSize) {
-          return true;  // Mothership is hit
+      if (gameOver) {
+        // Display game over message
+        if (allAliensDead()) {
+          u8g2.firstPage();
+          do {
+            u8g2.clearBuffer();
+            u8g2.setFont(u8g2_font_helvB08_tr);
+            u8g2.drawStr(35, 20, "You win!");
+          } while (u8g2.nextPage());
+        } else {
+          u8g2.firstPage();
+          do {
+            u8g2.clearBuffer();
+            u8g2.setFont(u8g2_font_helvB08_tr);
+            u8g2.drawStr(35, 20, "You lose!");
+          } while (u8g2.nextPage());
         }
+
+        break; // Exit the loop and end the game
       }
     }
   }
-  return false;
 }
+
 
 bool allAliensDead() {
   for (int row = 0; row < rows; row++) {
@@ -169,9 +155,12 @@ void updateAliens() {
 
     if (y >= (u8g2.getHeight() - (rows * (alienSize + spacing)))) {
       // Aliens have reached the bottom
-
-      y = 0;
+      gameOver = true; // Set game over state
     }
+  }
+
+  if (allAliensDead()) {
+    gameOver = true; // Set game over state
   }
 }
 

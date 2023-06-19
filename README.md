@@ -15,6 +15,7 @@ Project Timeframe: 31 May - 20 June 2023
 - Push buttons
 
 ## Hardware Prototype
+![si_hardwareprototype](https://github.com/Crystalsawers/arduino-space-invaders/assets/87682183/f754e27b-aadc-4359-a287-7e3af817df15)
 
 ## Circuit Diagram
 

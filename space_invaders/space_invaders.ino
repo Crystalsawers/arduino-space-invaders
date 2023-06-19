@@ -7,6 +7,19 @@ const int fireButtonPin = 2;      // Digital input pin for fire button
 const int soundPin = 3;           // Digital pin for sound
 const int joystickDeadZone = 20;  // Dead zone for joystick reading
 
+// Draw the mothership
+byte mothershipBytes[] = {
+  B00010000,
+  B00010000,
+  B00111000,
+  B00111000,
+  B01111100,
+  B01111110,
+  B11011011,
+  B11011011
+};
+
+// draw aliens
 byte alienPattern[] = {
   B01000010,  // Row 1
   B00100100,  // Row 2
@@ -24,18 +37,6 @@ byte alienStatus[2][6] = {
   { 1, 1, 1, 1, 1, 1 }   // bottom row of each alien
 };
 
-
-// Draw the mothership
-byte mothershipBytes[] = {
-  B00010000,
-  B00010000,
-  B00111000,
-  B00111000,
-  B01111100,
-  B01111110,
-  B11011011,
-  B11011011
-};
 
 int alienSize = 8;
 int spacing = 4;
